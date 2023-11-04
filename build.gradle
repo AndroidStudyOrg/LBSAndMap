@@ -2,6 +2,7 @@
 buildscript {
     ext {
         naverMapVersion = '3.17.0'
+        fusedLocationSourceVersion = '21.0.1'
     }
 }
 
