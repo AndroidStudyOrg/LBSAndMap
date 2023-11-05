@@ -1,7 +1,6 @@
 package org.shop.lbsandmap
 
 import android.Manifest
-import org.shop.lbsandmap.R
 import android.annotation.SuppressLint
 import android.location.Location
 import android.location.LocationManager
@@ -21,6 +20,7 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
+import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         currentProvider = intent.getStringExtra("provider")!!
+        locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkMyPermissionLocation()
@@ -128,9 +129,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         /**
          * 비동기 방식으로 GoogleMap 초기설정을 진행한다
          */
-        mapFragment.getMapAsync { googleMap: NaverMap ->
-            nMap = googleMap
-            nMap.uiSettings.isZoomControlEnabled = true
+        mapFragment.getMapAsync { naverMap: NaverMap ->
+            nMap = naverMap
+            nMap.locationSource = locationSource
+            nMap.locationTrackingMode = LocationTrackingMode.None
             nMap.uiSettings.isLocationButtonEnabled = true
 
             /**
@@ -219,7 +221,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onMapReady(p0: NaverMap) {
-
+    override fun onMapReady(naverMap: NaverMap) {
+        this.nMap = naverMap
     }
 }
