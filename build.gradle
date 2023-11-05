@@ -3,6 +3,7 @@ buildscript {
     ext {
         naverMapVersion = '3.17.0'
         fusedLocationSourceVersion = '21.0.1'
+        tedPermissionVersion = '3.3.0'
     }
 }
 

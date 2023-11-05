@@ -1,8 +1,10 @@
 package org.shop.lbsandmap
 
-import androidx.appcompat.app.AppCompatActivity
+import android.annotation.SuppressLint
+import android.location.Location
 import android.os.Bundle
 import androidx.annotation.UiThread
+import androidx.appcompat.app.AppCompatActivity
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
@@ -14,7 +16,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMainBinding
 
     private lateinit var locationSource: FusedLocationSource
-    private lateinit var naverMap: NaverMap
+    private lateinit var nMap: NaverMap
+    private lateinit var adapter: RVLocationAdapter
+    private val locationList = ArrayList<Location>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +29,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
 
         setMap()
+        adapter = RVLocationAdapter(locationList)
+        binding.rvLocation.adapter = adapter
     }
 
     private fun setMap() {
@@ -37,12 +43,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @UiThread
     override fun onMapReady(naverMap: NaverMap) {
-        this.naverMap = naverMap
+        this.nMap = naverMap
         naverMap.locationSource = locationSource
         naverMap.locationTrackingMode = LocationTrackingMode.Follow
         naverMap.uiSettings.isLocationButtonEnabled = true
+
+        locationSource.lastLocation?.let {
+            locationList.add(it)
+        }
+        adapter.notifyDataSetChanged()
     }
 
     override fun onRequestPermissionsResult(
@@ -52,7 +64,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     ) {
         if (locationSource.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
             if (!locationSource.isActivated) {
-                naverMap.locationTrackingMode = LocationTrackingMode.None
+                nMap.locationTrackingMode = LocationTrackingMode.None
             }
             return
         }
